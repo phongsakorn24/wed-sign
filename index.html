@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<title>ออกใบรับรองแพทย์ (ส่ง API จริง)</title>
+<style>
+  /* ธีมสีฟ้าสบายตา */
+  :root {
+    --primary-color: #007bff;
+    --primary-light: #cce5ff;
+    --primary-dark: #004085;
+    --bg-color: #f0f8ff;
+    --text-color: #1a1a1a;
+    --border-radius: 8px;
+  }
+
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    margin: 20px;
+  }
+
+  h2 {
+    text-align: center;
+    color: var(--primary-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 700;
+  }
+
+  h2 svg {
+    width: 32px;
+    height: 32px;
+    fill: var(--primary-color);
+  }
+
+  form {
+    max-width: 720px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px 30px;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  }
+
+  label {
+    display: block;
+    margin-top: 12px;
+    font-weight: 600;
+    color: var(--primary-dark);
+  }
+
+  input[type="text"],
+  input[type="number"],
+  textarea,
+  select {
+    width: 100%;
+    max-width: 100%;
+    padding: 8px 10px;
+    margin-top: 4px;
+    border: 1.5px solid var(--primary-light);
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+  }
+
+  input[type="text"]:focus,
+  input[type="number"]:focus,
+  textarea:focus,
+  select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 5px var(--primary-light);
+  }
+
+  textarea {
+    min-height: 80px;
+    resize: vertical;
+  }
+
+  fieldset {
+    margin-top: 20px;
+    padding: 15px 20px;
+    border: 1.5px solid var(--primary-light);
+    border-radius: var(--border-radius);
+    background: var(--primary-light);
+  }
+
+  legend {
+    padding: 0 10px;
+    font-weight: 700;
+    color: var(--primary-dark);
+  }
+
+  button {
+    margin-top: 25px;
+    padding: 12px 20px;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: background-color 0.3s;
+    width: 100%;
+    max-width: 300px;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    font-weight: 700;
+    box-shadow: 0 4px 10px rgba(0,123,255,0.4);
+  }
+  button:hover {
+    background-color: var(--primary-dark);
+    box-shadow: 0 6px 15px rgba(0,64,133,0.6);
+  }
+
+  #result {
+    max-width: 720px;
+    margin: 30px auto;
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 15px;
+    min-height: 200px;
+    overflow-y: auto;
+  }
+
+  iframe {
+    border: none;
+    border-radius: var(--border-radius);
+  }
+
+  /* Checkbox styling */
+  input[type="checkbox"] {
+    transform: scale(1.3);
+    margin-left: 8px;
+    cursor: pointer;
+  }
+
+  /* Loading indicator style */
+  #loadingIndicator {
+    display: none;
+    text-align: center;
+    margin-top: 15px;
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    form {
+      padding: 15px 20px;
+      margin: 10px;
+    }
+  }
+</style>
+</head>
+<body>
+
+<h2>
+  <!-- ไอคอนรูปกากบาทการแพทย์แบบ SVG -->
+  <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+    <circle cx="32" cy="32" r="30" stroke="none" fill="var(--primary-color)" />
+    <rect x="27" y="12" width="10" height="40" fill="white" />
+    <rect x="12" y="27" width="40" height="10" fill="white" />
+  </svg>
+  ออกใบรับรองแพทย์ (ส่ง API จริง)
+</h2>
+
+<form id="certForm" autocomplete="off">
+  <label>Hospital Code:
+    <input type="text" name="hospital_code" value="99998" required />
+  </label>
+  <label>Doctor ID:
+    <input type="text" name="doctor_id" value="1470501171139" required />
+  </label>
+  <label>Close QR Code:
+    <input type="checkbox" name="close_qrcode" />
+  </label>
+
+  <fieldset>
+    <legend>JSON Description</legend>
+    <label>Document Type:
+      <input type="text" name="documentType" value="MEDICAL-CERT" required />
+    </label>
+
+    <fieldset>
+      <legend>Creator</legend>
+      <label>Name:
+        <input type="text" name="creator_name" value="แพทย์ ทดสอบ" required />
+      </label>
+      <label>Identifier:
+        <input type="text" name="creator_identifier" value="ว0000" required />
+      </label>
+      <label>Affiliation:
+        <input type="text" name="creator_affiliation" value="โรงพยาบาลนครพิงค์" required />
+      </label>
+      <label>Address Locality:
+        <textarea name="creator_addressLocality">159 หมู่ที่ 10 ถนนโชตนา ตำบลดอนแก้ว อำเภอแม่ริม จังหวัดเชียงใหม่ 50180</textarea>
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Patient</legend>
+      <label>Global Location Number:
+        <input type="text" name="patient_globalLocationNumber" value="9999999999999" />
+      </label>
+      <label>Name:
+        <input type="text" name="patient_name" value="นายทดสอบ สร้างเอกสารรับรอง" />
+      </label>
+      <label>Nationality:
+        <input type="text" name="patient_nationality" value="ไทย" />
+      </label>
+      <label>Suggested Max Age:
+        <input type="number" name="patient_suggestedMaxAge" value="26" />
+      </label>
+    </fieldset>
+
+    <label>Medical Condition (คั่นด้วย | ):
+      <input type="text" name="medical_condition" value="ทดสอบออกความคิดเห็น 1|ทดสอบออกความคิดเห็น 2" />
+    </label>
+  </fieldset>
+
+  <fieldset>
+    <legend>PDF Sign</legend>
+    <label>อัพโหลดไฟล์ PDF:
+      <input type="file" name="pdfFile" accept="application/pdf" required />
+    </label>
+    <label>Sad Data:
+      <input type="text" name="sadData" value="" />
+    </label>
+    <label>Reason:
+      <input type="text" name="reason" value="" />
+    </label>
+    <label>Location:
+      <input type="text" name="location" value="TH" />
+    </label>
+    <label>Certify Level:
+      <select name="certifyLevel">
+        <option value="NON-CERTIFY" selected>NON-CERTIFY</option>
+        <option value="CERTIFY">CERTIFY</option>
+      </select>
+    </label>
+    <label>Hash Algorithm:
+      <select name="hashAlgorithm">
+        <option value="sha-256" selected>sha-256</option>
+        <option value="sha-1">sha-1</option>
+      </select>
+    </label>
+    <label>Overwrite Original:
+      <input type="checkbox" name="overwriteOriginal" checked />
+    </label>
+  </fieldset>
+
+  <fieldset>
+    <legend>Signature (ตัวอย่าง 2 รายการ)</legend>
+    <label>Signature 1 Rectangle:
+      <input type="text" name="sig1_rectangle" value="0.584, 0.085, 0.34, 0.053" />
+    </label>
+    <label>Signature 1 Page:
+      <input type="number" name="sig1_page" value="1" />
+    </label>
+    <label>Signature 1 Visible Signature:
+      <input type="text" name="sig1_visibleSignature" value="graphic" />
+    </label>
+    <label>Signature 1 Visible:
+      <input type="text" name="sig1_visible" value="signature" />
+    </label>
+
+    <label>Signature 2 Rectangle:
+      <input type="text" name="sig2_rectangle" value="0.684, 0.085, 0.34, 0.083" />
+    </label>
+    <label>Signature 2 Page:
+      <input type="number" name="sig2_page" value="1" />
+    </label>
+    <label>Signature 2 Visible Signature:
+      <input type="text" name="sig2_visibleSignature" value="graphic" />
+    </label>
+    <label>Signature 2 Visible:
+      <input type="text" name="sig2_visible" value="eseal" />
+    </label>
+  </fieldset>
+
+  <button type="submit">ส่งออกใบรับรอง</button>
+
+  <!-- Loading Indicator -->
+  <div id="loadingIndicator">กำลังดำเนินการ... กรุณารอสักครู่</div>
+</form>
+
+<h3 style="max-width:720px; margin: 30px auto 10px auto; color: var(--primary-dark); text-align:center;">
+  ผลลัพธ์ (Response จาก API):
+</h3>
+<div id="result" style="max-width:720px; margin: auto;"></div>
+
+<script>
+const loadingIndicator = document.getElementById('loadingIndicator');
+
+document.getElementById('certForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+
+  loadingIndicator.style.display = 'block';  // แสดง loading
+
+  const form = e.target;
+  const pdfFile = form.pdfFile.files[0];
+  if (!pdfFile) {
+    loadingIndicator.style.display = 'none';  // ซ่อนถ้า error
+    alert('กรุณาเลือกไฟล์ PDF');
+    return;
+  }
+
+  try {
+    // อ่านไฟล์ PDF เป็น base64
+    const base64pdf = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const base64 = reader.result.split(',')[1];
+        resolve(base64);
+      };
+      reader.onerror = error => reject(error);
+      reader.readAsDataURL(pdfFile);
+    });
+
+    // สร้าง medical_condition เป็น array จาก string คั่นด้วย |
+    const medicalConditions = form.medical_condition.value
+      .split('|')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    // สร้าง JSON body
+    const body = {
+      hospital_code: form.hospital_code.value,
+      doctor_id: form.doctor_id.value,
+      close_qrcode: form.close_qrcode.checked,
+      json_description: {
+        documentType: form.documentType.value,
+        creator: {
+          addressLocality: form.creator_addressLocality.value,
+          affiliation: form.creator_affiliation.value,
+          identifier: form.creator_identifier.value,
+          name: form.creator_name.value
+        },
+        patient: {
+          globalLocationNumber: form.patient_globalLocationNumber.value,
+          name: form.patient_name.value,
+          nationality: form.patient_nationality.value,
+          suggestedMaxAge: form.patient_suggestedMaxAge.value
+        },
+        medical_condition: medicalConditions
+      },
+      pdf_sign: {
+        pdfData: base64pdf,
+        sadData: form.sadData.value,
+        reason: form.reason.value,
+        location: form.location.value,
+        certifyLevel: form.certifyLevel.value,
+        hashAlgorithm: form.hashAlgorithm.value,
+        overwriteOriginal: form.overwriteOriginal.checked
+      },
+      signature: [
+        {
+          visibleSignatureRectangle: form.sig1_rectangle.value,
+          visibleSignaturePage: Number(form.sig1_page.value),
+          visibleSignature: form.sig1_visibleSignature.value,
+          visible: form.sig1_visible.value
+        },
+        {
+          visibleSignatureRectangle: form.sig2_rectangle.value,
+          visibleSignaturePage: Number(form.sig2_page.value),
+          visibleSignature: form.sig2_visibleSignature.value,
+          visible: form.sig2_visible.value
+        }
+      ]
+    };
+
+    // เรียก API
+    const response = await fetch('https://staging-ecredential.onespace.co.th/api/v4/vaccine-certificate/verifiable-credential/multi-sign-ssl/pdf/cad/doctor-cid', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    // เช็คถ้า response ไม่ ok (error)
+    if (!response.ok) {
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch {
+        const errorText = await response.text();
+        throw new Error(`HTTP ${response.status} - ${errorText}`);
+      }
+
+      if (errorData.status_result) {
+        const sr = errorData.status_result;
+        alert(`Error ${sr.status_message_code}:\n${sr.status_message_th}\n${sr.status_message_en}`);
+        throw new Error(`API error ${sr.status_message_code}: ${sr.status_message_th}`);
+      } else {
+        throw new Error(`HTTP ${response.status} - ${JSON.stringify(errorData)}`);
+      }
+    }
+
+    const data = await response.json();
+    const base64pdfResult = data.result?.pdf_data;
+
+    const resultDiv = document.getElementById('result');
+    resultDiv.innerHTML = '';
+
+    if (base64pdfResult) {
+      const pdfBlob = base64ToBlob(base64pdfResult, 'application/pdf');
+      const pdfUrl = URL.createObjectURL(pdfBlob);
+      const pdfViewer = document.createElement('iframe');
+      pdfViewer.style.width = '100%';
+      pdfViewer.style.height = '600px';
+      pdfViewer.src = pdfUrl;
+      resultDiv.appendChild(pdfViewer);
+
+      alert('โหลด PDF เรียบร้อย');
+    } else {
+      resultDiv.textContent = JSON.stringify(data, null, 2);
+    }
+  } catch (error) {
+    document.getElementById('result').textContent = `เกิดข้อผิดพลาด:\n${error.message}`;
+    if (!error.message.includes('API error')) {
+      alert('เกิดข้อผิดพลาดในการส่งข้อมูล กรุณาตรวจสอบ Console');
+    }
+    console.error(error);
+  } finally {
+    loadingIndicator.style.display = 'none'; // ซ่อน loading ทุกกรณีเมื่อจบ try-catch
+  }
+});
+
+function base64ToBlob(base64, mime) {
+  const sliceSize = 1024;
+  const byteChars = atob(base64);
+  const byteArrays = [];
+
+  for (let offset = 0; offset < byteChars.length; offset += sliceSize) {
+    const slice = byteChars.slice(offset, offset + sliceSize);
+    const byteNumbers = new Array(slice.length);
+    for (let i = 0; i < slice.length; i++) {
+      byteNumbers[i] = slice.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    byteArrays.push(byteArray);
+  }
+
+  return new Blob(byteArrays, { type: mime });
+}
+</script>
+
+</body>
+</html>
