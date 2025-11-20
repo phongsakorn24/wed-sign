@@ -2,6 +2,7 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>ออกใบรับรองแพทย์ (ส่ง API จริง)</title>
 <style>
   /* ธีมสีฟ้าสบายตา */
@@ -155,6 +156,38 @@
     form {
       padding: 15px 20px;
       margin: 10px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    body {
+      margin: 10px;
+      font-size: 14px;
+    }
+
+    form {
+      padding: 10px 15px;
+      margin: 5px;
+    }
+
+    button {
+      font-size: 16px;
+      max-width: 100%;
+    }
+
+    input[type="text"],
+    input[type="number"],
+    textarea,
+    select {
+      font-size: 14px;
+    }
+
+    h2 {
+      font-size: 20px;
+    }
+
+    #result iframe {
+      height: 400px;
     }
   }
 </style>
